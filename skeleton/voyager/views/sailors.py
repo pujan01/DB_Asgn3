@@ -4,6 +4,7 @@ from flask import g
 from flask import escape
 from flask import render_template
 from flask import request
+from flask import redirect
 
 from voyager.db import get_db, execute
 from voyager.validate import validate_field, render_errors
@@ -37,6 +38,20 @@ def views(bp):
             boat_color = request.args.get("color")
             rows = get_sailors_from_boat_color(conn, boat_color)
         return render_template("table.html", name="Sailors who sailed on " + boat_color + " boats", rows=rows)
+    
+    @bp.route("/sailors/add")
+    def _load_sailor_page():
+        return render_template("addsailor.html")
+    
+    @bp.route("/sailors/add/post", methods = ["Post"])
+    def _add_a_sailor():
+        with get_db() as conn:
+            sname = request.form["sname"]
+            age = request.form["age"]
+            exp = request.form["exp"]
+            add_a_sailor(conn, sname, age, exp)
+            rows = sailors(conn)
+        return render_template("table.html", name="Sailors", rows=rows)
 
 def sailors(conn):
     return execute(conn, "SELECT s.sid, s.name, s.age, s.experience FROM Sailors AS s")
@@ -49,3 +64,6 @@ def get_sailors_from_date(conn, date):
 
 def get_sailors_from_boat_color(conn, boat_color):
    return execute(conn, "SELECT s.sid, s.name, s.age, s.experience, b.name, v.date_of_voyage FROM Sailors s , Voyages v, Boats b WHERE  b.color = :b_color AND s.sid = v.sid AND v.bid = b.bid", {'b_color': boat_color })
+
+def add_a_sailor(conn, sname, age, exp):
+    return execute(conn, "INSERT INTO Sailors (sname, age, experience) VALUES (:s_name, :s_age, :s_exp)", {'s_name': sname }, {'s_age': age }, {'s_exp': exp })

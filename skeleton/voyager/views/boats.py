@@ -7,7 +7,6 @@ from flask import escape
 
 from voyager.db import get_db, execute
 
-
 def views(bp):
     @bp.route("/boats")
     def _boats():
