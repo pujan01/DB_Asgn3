@@ -20,11 +20,11 @@ def views(bp):
         with get_db() as conn:
             sailor_name = request.args.get("sailor-name")
             rows = get_boats_from_sailor_name(conn, sailor_name)
-        return render_template("table.html", name="Boats", rows=rows)
+        return render_template("table.html", name="Boats sailed by " + sailor_name, rows=rows)
 
 
 def boats(conn):
     return execute(conn, "SELECT b.bid, b.name, b.color FROM Boats AS b")
 
 def get_boats_from_sailor_name(conn, sailor_name):
-    return execute(conn, "SELECT b.bid, b.name, b.color FROM Sailors s , Voyages v, Boats b WHERE b.name = boat_name, s.sid = v.sid, v.bid = b.bid", {'sailor_name': sailor_name })
+    return execute(conn, "SELECT b.name, b.color, v.date_of_voyage FROM Sailors s , Voyages v, Boats b WHERE  s.name = :s_name AND s.sid = v.sid AND v.bid = b.bid", {'s_name': sailor_name })

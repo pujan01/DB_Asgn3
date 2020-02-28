@@ -24,11 +24,19 @@ def views(bp):
             rows = get_sailors_from_boat_name(conn, boat_name)
         return render_template("table.html", name="Sailors who sailed on " + boat_name, rows=rows)
 
+    @bp.route("/sailors/who-sailed-on-date")
+    def _get_sailors_from_date():
+        with get_db() as conn:
+            date = request.args.get("date")
+            rows = get_sailors_from_date(conn, date)
+        return render_template("table.html", name="Sailors who sailed on " + date, rows=rows)
+
 def sailors(conn):
     return execute(conn, "SELECT s.sid, s.name, s.age, s.experience FROM Sailors AS s")
 
 def get_sailors_from_boat_name(conn, boat_name):
     return execute(conn, "SELECT s.sid, s.name, s.age, s.experience, b.name, v.date_of_voyage FROM Sailors s , Voyages v, Boats b WHERE  b.name = :b_name AND s.sid = v.sid AND v.bid = b.bid", {'b_name': boat_name })
 
-# WHERE Voyages.date_of_voyage = :v_date", {'v_date': voyage_date})
-# func (conn, "Select ... FROM ... WHERE Voyages.date_of_voyage = :v_date",  {'v_date': voyage_date})
+def get_sailors_from_date(conn, date):
+    print("dsda")
+    return execute(conn, "SELECT s.sid, s.name, s.age, s.experience, b.name FROM Sailors s , Voyages v, Boats b WHERE  v.date_of_voyage = :v_date AND s.sid = v.sid AND v.bid = b.bid", {'v_date': date })
