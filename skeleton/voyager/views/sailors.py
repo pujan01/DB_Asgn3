@@ -65,8 +65,5 @@ def get_sailors_from_date(conn, date):
 def get_sailors_from_boat_color(conn, boat_color):
    return execute(conn, "SELECT s.sid, s.name, s.age, s.experience, b.name, v.date_of_voyage FROM Sailors s , Voyages v, Boats b WHERE  b.color = :b_color AND s.sid = v.sid AND v.bid = b.bid", {'b_color': boat_color })
 
-
-
-
 def add_a_sailor(conn, name, age, exp):
     return execute(conn, "INSERT INTO Sailors(name,age,experience) VALUES (:name,:age,:experience) ", {'name': name, 'age': age, 'experience': exp } )
