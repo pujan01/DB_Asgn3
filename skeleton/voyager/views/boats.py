@@ -22,9 +22,17 @@ def views(bp):
             rows = get_boats_from_sailor_name(conn, sailor_name)
         return render_template("table.html", name="Boats sailed by " + sailor_name, rows=rows)
 
-
+    @bp.route("/boats/by-popularity")
+    def _get_boats_by_popularity():
+        with get_db() as conn:
+            rows = get_boats_by_popularity(conn)
+        return render_template("table.html", name="Most popular boats", rows=rows)
+    
 def boats(conn):
     return execute(conn, "SELECT b.bid, b.name, b.color FROM Boats AS b")
 
 def get_boats_from_sailor_name(conn, sailor_name):
     return execute(conn, "SELECT b.name, b.color, v.date_of_voyage FROM Sailors s , Voyages v, Boats b WHERE  s.name = :s_name AND s.sid = v.sid AND v.bid = b.bid", {'s_name': sailor_name })
+
+def get_boats_by_popularity(conn):
+    return execute(conn, "SELECT b.name, b.color, COUNT(b.bid) as Total FROM Sailors s , Voyages v, Boats b WHERE s.sid = v.sid AND v.bid = b.bid GROUP BY v.bid")
